@@ -21,6 +21,41 @@ class DataProcesser:
             filePath.append(str(tempPath))
             self.__filePath.append(str(filePath[i]))
 
+    def loadFile(self):
+        label = [] 
+        acc = []
+        ecg = []
+        emg = []
+        eda = []
+        resp = []
+        temp = []
+        subject = []
+        column = [label, acc, ecg, emg, eda, resp, temp, subject]
+        for i in column:
+            np.array(i)
+
+        data = pd.DataFrame()
+        for i in range(len(self.__filePath)):
+            with open(self.__filePath[i], "rb") as f:
+                temp = pickle.load(f, encoding="bytes")
+                signalData = temp[b"signal"]
+                chest = signalData[b"chest"]
+                tempList  = chest[b"ACC"].tolist()
+                tempArry = np.array(tempList).T
+                length = len(tempArry[0])
+                print(len(chest))
+            tempData ={
+                "ACC0": tempArry[0],
+                "Acc1": tempArry[1],
+                "ACC2": tempArry[2],
+                "ECG": chest[b'ECG'].reshape(length,),
+                "EMG": chest[b'EMG'].reshape(length,),
+                "EDA": chest[b'EDA'].reshape(length,),
+                "resp": chest[b'Resp'].reshape(length,),
+                "temp": chest[b'Temp'].reshape(length,),
+                "label": temp[b"label"].reshape(length,),
+            }
+    
     def __readFile(self):       #read WESAD file, get the data and concat to a dataframe
         label = [] 
         acc = []
